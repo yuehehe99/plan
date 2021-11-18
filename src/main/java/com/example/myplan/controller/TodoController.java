@@ -30,10 +30,10 @@ public class TodoController {
         return todoService.save(dto);
     }
 
-    @PatchMapping("/{id}")
+    @PatchMapping("/{userId}/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteTodo(@PathVariable Long id) throws Exception {
-        todoService.deleteTodo(id);
+    public void deleteTodo(@PathVariable Long id,@PathVariable Long userId) throws Exception {
+        todoService.deleteTodo(id,userId);
     }
 
     @PutMapping

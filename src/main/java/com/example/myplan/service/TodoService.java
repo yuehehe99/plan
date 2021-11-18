@@ -3,7 +3,6 @@ package com.example.myplan.service;
 import com.example.myplan.entity.Todo;
 import com.example.myplan.entity.Users;
 import com.example.myplan.entity.dto.TodoDTO;
-import com.example.myplan.exception.TodoNotFoundException;
 import com.example.myplan.repository.TodoRepository;
 import com.example.myplan.repository.UsersRepository;
 import lombok.AllArgsConstructor;
@@ -41,26 +40,35 @@ public class TodoService {
         return todoRepository.save(todo);
     }
 
-    public void deleteTodo(Long todoId) {
-        try {
-            Todo byId = todoRepository.findById(todoId).get();
-            byId.setDeleted(true);
-            todoRepository.save(byId);
-        } catch (Throwable exception) {
-            throw new TodoNotFoundException("This Todo Info Not Found!");
-        }
+    public void deleteTodo(Long id, Long userId) {
+        List<Todo> todosByUsersIdAndDeleted = todoRepository.findTodosByUsersIdAndDeleted(userId, false); //findTodosByUsersIdAndIdAndDeleted
+        for (Todo todo : todosByUsersIdAndDeleted)
+            if (todo.getId().equals(id)){
+                todo.setDeleted(true);
+                todoRepository.save(todo);
+            }
     }
 
     public Todo UpdateTodo(TodoDTO dto) {
-        try {
-            Todo byId = todoRepository.findByIdAndDeleted(dto.getId(), false).get();
-            byId.setName(dto.getName());
-            byId.setContent(dto.getContent());
-            byId.setType(dto.getType());
-            return todoRepository.save(byId);
-        } catch (Throwable exception) {
-            throw new TodoNotFoundException("This Todo Info Not Found!");
-        }
+
+        List<Todo> todosByUsersIdAndDeleted = todoRepository.findTodosByUsersIdAndDeleted(dto.getUserId(), false); //findTodosByUsersIdAndIdAndDeleted
+        for (Todo todo : todosByUsersIdAndDeleted)
+            if (todo.getId().equals(dto.getId())){
+                todo.setName(dto.getName());
+                todo.setContent(dto.getContent());
+                todo.setType(dto.getType());
+                return todoRepository.save(todo);
+            }
+        return null;
+//        try {
+//            Todo byId = todoRepository.findByIdAndDeleted(dto.getId(), false).get();
+//            byId.setName(dto.getName());
+//            byId.setContent(dto.getContent());
+//            byId.setType(dto.getType());
+//            return todoRepository.save(byId);
+//        } catch (Throwable exception) {
+//            throw new TodoNotFoundException("This Todo Info Not Found!");
+//        }
 
     }
 }
