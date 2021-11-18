@@ -1,6 +1,6 @@
 DROP TABLE IF EXISTS `users`;
 
-CREATE TABLE users
+CREATE TABLE user
 (
     `id`      bigint(20) NOT NULL auto_increment,
     `name`    VARCHAR(20) NOT NULL,

@@ -1,8 +1,9 @@
 package com.example.myplan.controller;
 
-import com.example.myplan.entity.Todo;
-import com.example.myplan.entity.dto.TodoDTO;
-import com.example.myplan.service.TodoService;
+import com.example.myplan.entity.Task;
+import com.example.myplan.exception.TaskNotFoundException;
+import com.example.myplan.resource.TaskResource;
+import com.example.myplan.service.TaskService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -20,38 +21,38 @@ import java.util.List;
 @RestController
 @RequestMapping("/todo")
 @AllArgsConstructor
-public class TodoController {
+public class TaskController {
 
-    private final TodoService todoService;
+    private final TaskService taskService;
 
     @PostMapping
     @ResponseStatus( HttpStatus.CREATED)
-    public Todo addTodo(@RequestBody TodoDTO dto) {
-        return todoService.save(dto);
+    public Task addTask(@RequestBody TaskResource resource) {
+        return taskService.save(resource);
     }
 
     @PatchMapping("/{userId}/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteTodo(@PathVariable Long id,@PathVariable Long userId) throws Exception {
-        todoService.deleteTodo(id,userId);
+    public void deleteTask(@PathVariable Long id,@PathVariable Long userId) throws Exception {
+        taskService.deleteTask(id,userId);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public Todo UpdateTodo(@RequestBody TodoDTO dto) throws Exception {
-        return todoService.UpdateTodo(dto);
+    public Task UpdateTask(@RequestBody TaskResource dto) throws Exception {
+        return taskService.UpdateTask(dto);
     }
 
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
-    public List<Todo> getAllTodo(@PathVariable Long userId) {
-        return todoService.getAllTodo(userId);
+    public List<Task> getAllTask(@PathVariable Long userId) {
+        return taskService.getAllTask(userId);
     }
 
     @GetMapping("/{userId}/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Todo getTodo(@PathVariable Long id,@PathVariable Long userId) throws Exception {
-        return todoService.getById(id,userId);
+    public Task getTask(@PathVariable Long id, @PathVariable Long userId) throws TaskNotFoundException {
+        return taskService.getById(id,userId);
     }
 }
 

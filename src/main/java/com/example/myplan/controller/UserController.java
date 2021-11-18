@@ -1,11 +1,8 @@
 package com.example.myplan.controller;
 
-import com.example.myplan.entity.Todo;
-import com.example.myplan.entity.Users;
-import com.example.myplan.entity.dto.TodoDTO;
-import com.example.myplan.entity.dto.UsersDTO;
-import com.example.myplan.service.TodoService;
-import com.example.myplan.service.UsersService;
+import com.example.myplan.entity.User;
+import com.example.myplan.resource.UserResource;
+import com.example.myplan.service.UserService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.HttpStatus;
 
@@ -22,16 +19,16 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 
 @RestController
-@RequestMapping("/users")
+@RequestMapping("/user")
 @AllArgsConstructor
-public class UsersController {
+public class UserController {
 
-    private final UsersService usersService;
+    private final UserService usersService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public Users addUser(@RequestBody Users users) {
-        return usersService.save(users);
+    public User addUser(@RequestBody UserResource resource) {
+        return usersService.save(resource);
     }
 
     @PatchMapping("/{id}")
@@ -42,15 +39,20 @@ public class UsersController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public Users UpdateTodo(@RequestBody UsersDTO dto) {
+    public User UpdateTodo(@RequestBody UserResource dto) {
         return usersService.UpdateUser(dto);
+    }
+
+    @GetMapping("{id}")
+    @ResponseStatus(HttpStatus.OK)
+    public User getUser(@PathVariable Long id) {
+        return usersService.getUserAndJudge(id);
     }
 
     @GetMapping
     @ResponseStatus(HttpStatus.OK)
-    public List<Users> getAllUsers() {
-        return usersService.getAllUsers();
+    public List<User> getAllUser() {
+        return usersService.getAllUser();
     }
-
 }
 

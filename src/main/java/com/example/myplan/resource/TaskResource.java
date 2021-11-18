@@ -1,4 +1,4 @@
-package com.example.myplan.entity.dto;
+package com.example.myplan.resource;
 
 import lombok.Builder;
 import lombok.Data;
@@ -7,9 +7,10 @@ import javax.validation.constraints.NotBlank;
 
 @Data
 @Builder
-public class TodoDTO {
+public class TaskResource {
 
-    private Long id;
+    private Long taskId;
+
     private Long userId;
 
     @NotBlank(message = "name can not be blank!")
