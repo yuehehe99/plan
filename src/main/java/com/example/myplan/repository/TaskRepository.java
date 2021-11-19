@@ -11,8 +11,8 @@ import java.util.Optional;
 public interface TaskRepository extends JpaRepository<Task, Long> {
     Optional<Task> findByIdAndDeleted(Long todoId, boolean deleted);
 
-    Optional<List<Task>> findAllAndDeleted(boolean deleted);
+//    Optional<List<Task>> findAllAndDeleted(boolean deleted);
 
-    List<Task> findTasksByUsersIdAndDeleted(Long userId, boolean deleted);
+    List<Task> findTasksByUserIdAndDeleted(Long userId, boolean deleted);
 
 }

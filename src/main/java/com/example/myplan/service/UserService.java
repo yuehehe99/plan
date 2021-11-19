@@ -50,8 +50,8 @@ public class UserService {
         return byId.isEmpty() ? null : byId.get();
     }
 
-    public List<User> getAllUser() {
-        return userRepository.findAllAndDeleted(false);
-    }
+//    public List<User> getAllUser() {
+//        return userRepository.findAllAndDeleted(false);
+//    }
 
 }

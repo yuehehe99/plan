@@ -3,7 +3,6 @@ package com.example.myplan.exception;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -29,8 +28,8 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResult);
     }
 
-    @ExceptionHandler(TodoNotFoundException.class)
-    public ResponseEntity<ErrorResult> TodoNotFoundException(TodoNotFoundException e){
+    @ExceptionHandler(TaskNotFoundException.class)
+    public ResponseEntity<ErrorResult> TodoNotFoundException(TaskNotFoundException e){
         ErrorResult apiError = ErrorResult.builder()
                 .message(e.getMessage())
                 .build();

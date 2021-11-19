@@ -11,6 +11,6 @@ CREATE TABLE task
     `created_at` datetime    NOT NULL,
     `updated_at` datetime    NOT NULL,
     PRIMARY KEY (`id`),
-    CONSTRAINT user_id_tasks FOREIGN KEY (`user_id`) REFERENCES `users` (`id`)
+    CONSTRAINT user_id_task FOREIGN KEY (`user_id`) REFERENCES `user` (`id`)
 
 ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;

@@ -3,21 +3,24 @@ package com.example.myplan.service;
 import com.example.myplan.entity.Task;
 import com.example.myplan.entity.User;
 import com.example.myplan.resource.TaskResource;
-import com.example.myplan.exception.TaskNotFoundException;
 import com.example.myplan.repository.TaskRepository;
-import com.example.myplan.repository.UserRepository;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
 
 @Service
-@AllArgsConstructor
 public class TaskService {
     private final TaskRepository taskRepository;
-    private final UserRepository usersRepository;
-    private final UserService userService;
+    private UserService userService;
+
+    public TaskService(TaskRepository taskRepository, @Lazy UserService userService) {
+        this.taskRepository = taskRepository;
+        this.userService = userService;
+    }
 
     public Task save(TaskResource resource) {
         User userAndJudge = userService.getUserAndJudge(resource.getUserId());
@@ -33,6 +36,8 @@ public class TaskService {
     }
 
     private Task getTaskAndJudge(Long id) {
+        if(null == id)
+            return null;
         Optional<Task> byId = taskRepository.findById(id);
         return byId.isEmpty() ? null : byId.get();
     }
@@ -41,6 +46,7 @@ public class TaskService {
         Task taskAndJudge = getTaskAndJudge(id);
         if (null != taskAndJudge) {
             taskAndJudge.setDeleted(userId.equals(taskAndJudge.getUser().getId()) || taskAndJudge.isDeleted());
+            taskRepository.save(taskAndJudge);
         }
     }
 
@@ -67,6 +73,10 @@ public class TaskService {
     }
 
     public List<Task> getAllTask(Long userId) {
-        return taskRepository.findTasksByUsersIdAndDeleted(userId, false);
+        return taskRepository.findTasksByUserIdAndDeleted(userId, false);
+    }
+
+    public List<Task> getAllTask() {
+        return taskRepository.findAll();
     }
 }
