@@ -2,6 +2,7 @@ package com.example.myplan.service;
 
 import com.example.myplan.entity.Task;
 import com.example.myplan.entity.User;
+import com.example.myplan.repository.TaskRepository;
 import com.example.myplan.resource.UserResource;
 import com.example.myplan.repository.UserRepository;
 import lombok.AllArgsConstructor;
@@ -14,6 +15,7 @@ import java.util.Optional;
 @AllArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final TaskRepository taskRepository;
     private final TaskService taskService;
 
     public User save(UserResource resource) {
@@ -29,9 +31,13 @@ public class UserService {
         User userAndJudge = getUserAndJudge(id);
         if (null != userAndJudge){
             userAndJudge.setDeleted(true);
+            userRepository.save(userAndJudge);
 
             List<Task> allTask = taskService.getAllTask(userAndJudge.getId());
-            allTask.forEach(task -> task.setDeleted(true));
+            allTask.forEach(task -> {
+                task.setDeleted(true);
+                taskRepository.save(task);
+            });
         }
     }
 
@@ -49,9 +55,5 @@ public class UserService {
         Optional<User> byId = userRepository.findById(id);
         return byId.isEmpty() ? null : byId.get();
     }
-
-//    public List<User> getAllUser() {
-//        return userRepository.findAllAndDeleted(false);
-//    }
 
 }

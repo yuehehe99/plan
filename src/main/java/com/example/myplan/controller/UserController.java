@@ -49,10 +49,5 @@ public class UserController {
         return usersService.getUserAndJudge(id);
     }
 
-//    @GetMapping
-//    @ResponseStatus(HttpStatus.OK)
-//    public List<User> getAllUser() {
-//        return usersService.getAllUser();
-//    }
 }
 

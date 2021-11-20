@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface TaskRepository extends JpaRepository<Task, Long> {
-    Optional<Task> findByIdAndDeleted(Long todoId, boolean deleted);
+    Optional<Task> findByIdAndDeleted(Long taskId, boolean deleted);
 
 //    Optional<List<Task>> findAllAndDeleted(boolean deleted);
 

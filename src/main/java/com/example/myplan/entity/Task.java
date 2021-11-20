@@ -23,7 +23,7 @@ import javax.validation.constraints.NotBlank;
 import java.time.Instant;
 
 @Entity
-@Table(name = "todo")
+@Table(name = "task")
 @Data
 @Builder
 @AllArgsConstructor
@@ -50,7 +50,7 @@ public class Task {
     @JsonIgnore
     private Instant updatedAt;
 
-//    @JsonIgnore
+    //    @JsonIgnore
     @Column(columnDefinition = "TINYINT(1)")
     private boolean deleted;
 
