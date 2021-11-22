@@ -2,6 +2,7 @@ package com.example.myplan.service;
 
 import com.example.myplan.entity.Task;
 import com.example.myplan.entity.User;
+import com.example.myplan.exception.TaskNotFoundException;
 import com.example.myplan.repository.TaskRepository;
 import com.example.myplan.resource.UserResource;
 import com.example.myplan.repository.UserRepository;
@@ -39,6 +40,7 @@ public class UserService {
                 taskRepository.save(task);
             });
         }
+        throw new TaskNotFoundException("User is not found!");
     }
 
     public User UpdateUser(UserResource resource) {
@@ -48,7 +50,7 @@ public class UserService {
             userAndJudge.setGender(resource.isGender());
             return userRepository.save(userAndJudge);
         }
-        return null;
+        throw new TaskNotFoundException("User is not found!");
     }
 
     public User getUserAndJudge(Long id) {

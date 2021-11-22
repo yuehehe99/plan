@@ -40,7 +40,7 @@ public class TaskService {
                     .user(userAndJudge)
                     .build());
 
-        throw new TaskNotFoundException("UserNotFoundException");
+        throw new TaskNotFoundException("User is not found!");
     }
 
     private Task getTaskAndJudge(Long id) {
@@ -56,11 +56,11 @@ public class TaskService {
             taskAndJudge.setDeleted(userId.equals(taskAndJudge.getUser().getId()) || taskAndJudge.isDeleted());
             taskRepository.save(taskAndJudge);
         } else
-            throw new TaskNotFoundException("TaskNotFoundException");
+            throw new TaskNotFoundException("Task is not found!");
 
     }
 
-    public Task UpdateTask(TaskResource resource) {
+    public Task updateTask(TaskResource resource) {
         Task taskAndJudge = getTaskAndJudge(resource.getTaskId());
         if (null != taskAndJudge) {
             if (Objects.equals(taskAndJudge.getUser().getId(), resource.getUserId())) {
@@ -70,7 +70,7 @@ public class TaskService {
                 return taskRepository.save(taskAndJudge);
             }
         }
-        throw new TaskNotFoundException("TaskNotFoundException");
+        throw new TaskNotFoundException("Task is not found!");
     }
 
     public Task getById(Long id, Long userId) {
@@ -78,7 +78,7 @@ public class TaskService {
         if (null != taskAndJudge) {
             return userId.equals(taskAndJudge.getUser().getId()) ? taskAndJudge : null;
         }
-        throw new TaskNotFoundException("TaskNotFoundException");
+        throw new TaskNotFoundException("Task is not found!");
     }
 
     public List<Task> getAllTask(Long userId) {
@@ -87,7 +87,7 @@ public class TaskService {
             return taskRepository.findTasksByUserIdAndDeleted(userId, false);
         }
 
-        throw new TaskNotFoundException("UserNotFoundException");
+        throw new TaskNotFoundException("User is not found!");
     }
 
     public List<Task> getByName(String name, Long userId) {
@@ -97,13 +97,13 @@ public class TaskService {
                     .filter(task -> Objects.equals(task.getUser().getId(), userId))
                     .collect(Collectors.toList());
 
-        throw new TaskNotFoundException("TaskNotFoundException");
+        throw new TaskNotFoundException("Task is not found!");
     }
 
     public Page<Task> getByConditions(MultiConditonReSource resource) {
         Optional<User> byIdAndDeleted = userRepository.findByIdAndDeleted(resource.getUserId(), false);
         if (byIdAndDeleted.isEmpty())
-            throw new TaskNotFoundException("UserNotFoundException");
+            throw new TaskNotFoundException("User is not found!");
 
         Specification<Task> specification = (root, query, builder) -> {
             List<Predicate> predicateList = new ArrayList<>();

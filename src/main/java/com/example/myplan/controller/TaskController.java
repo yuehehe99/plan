@@ -42,7 +42,7 @@ public class TaskController {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public Task updateTask(@RequestBody TaskResource dto) throws Exception {
-        return taskService.UpdateTask(dto);
+        return taskService.updateTask(dto);
     }
 
     /**
