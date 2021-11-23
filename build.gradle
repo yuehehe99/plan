@@ -1,13 +1,11 @@
 plugins {
-    id 'org.springframework.boot' version '2.5.6'
-    id 'io.spring.dependency-management' version '1.0.11.RELEASE'
+    id 'org.springframework.boot' version '2.4.1'
+    id 'io.spring.dependency-management' version '1.0.10.RELEASE'
     id 'java'
 }
 
-group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '11'
-targetCompatibility = '11'
+sourceCompatibility = JavaVersion.VERSION_11
 
 configurations {
     compileOnly {
@@ -16,24 +14,30 @@ configurations {
 }
 
 repositories {
+    maven { url 'https://maven.aliyun.com/repository/public' }
+    maven { url 'https://maven.aliyun.com/repository/spring/'}
+    mavenLocal()
     mavenCentral()
 }
 
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-web'
     implementation('org.springframework.boot:spring-boot-starter-data-jpa')
-    implementation 'org.flywaydb:flyway-core'
-    runtimeOnly 'mysql:mysql-connector-java'
-
+    implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation('org.projectlombok:lombok')
     implementation 'org.springframework.boot:spring-boot-starter-validation'
     implementation ('org.springframework.boot:spring-boot-starter-data-jpa')
     implementation 'junit:junit:4.13.2'
+    implementation 'org.flywaydb:flyway-core'
+    runtimeOnly 'mysql:mysql-connector-java'
+    testImplementation('org.mockito:mockito-core:3.12.4')
 
     compileOnly 'org.projectlombok:lombok'
     annotationProcessor 'org.projectlombok:lombok'
 
-    testImplementation 'org.springframework.boot:spring-boot-starter-test'
+    testImplementation('org.springframework.boot:spring-boot-starter-test') {
+        exclude group: 'org.junit.vintage', module: 'junit-vintage-engine'
+    }
 }
 
 test {

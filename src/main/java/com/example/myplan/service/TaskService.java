@@ -43,7 +43,7 @@ public class TaskService {
         throw new TaskNotFoundException("User is not found!");
     }
 
-    private Task getTaskAndJudge(Long id) {
+    public Task getTaskAndJudge(Long id) {
         if (null == id)
             return null;
         Optional<Task> byId = taskRepository.findByIdAndDeleted(id, false);
@@ -68,7 +68,8 @@ public class TaskService {
                 taskAndJudge.setContent(resource.getContent());
                 taskAndJudge.setType(resource.getType());
                 return taskRepository.save(taskAndJudge);
-            }
+            }else
+                throw new TaskNotFoundException("Task is not found!");
         }
         throw new TaskNotFoundException("Task is not found!");
     }

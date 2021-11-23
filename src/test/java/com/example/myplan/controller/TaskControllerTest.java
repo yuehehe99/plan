@@ -1,0 +1,162 @@
+package com.example.myplan.controller;
+
+import com.example.myplan.entity.Task;
+import com.example.myplan.entity.User;
+import com.example.myplan.repository.TaskRepository;
+import com.example.myplan.resource.MultiConditonReSource;
+import com.example.myplan.resource.TaskResource;
+import com.example.myplan.service.TaskService;
+import org.junit.After;
+import org.junit.Before;
+import org.junit.jupiter.api.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mockito;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
+import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.junit4.SpringRunner;
+import org.springframework.test.web.servlet.MockMvc;
+
+import java.util.Optional;
+
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@SpringBootTest
+@RunWith(SpringRunner.class)
+@AutoConfigureMockMvc
+public class TaskControllerTest {
+    @Autowired
+    private MockMvc mockMvc;
+
+    @MockBean
+    private TaskService taskService;
+
+    private TaskRepository taskRepository;
+
+    private MultiConditonReSource multiConditonReSource;
+
+    private Task task;
+    private User user;
+    private TaskResource taskResource;
+
+    @Before
+    public void setUp() {
+        multiConditonReSource = MultiConditonReSource.builder()
+                .name("task")
+                .content("task")
+                .type("life")
+                .userId(1L)
+                .taskId(1L)
+                .build();
+        user = User.builder()
+                .id(1L)
+                .name("xiao")
+                .deleted(false)
+                .gender(false)
+                .build();
+
+        task = Task.builder()
+                .user(user)
+                .name("task")
+                .content("task list")
+                .type("life")
+                .build();
+        taskResource = TaskResource.builder()
+                .name("task")
+                .content("task list")
+                .type("life")
+                .userId(1L)
+                .taskId(1L)
+                .build();
+    }
+
+    @After
+    public void afterEach() {
+        Mockito.reset(taskService);
+    }
+
+    @Test
+    public void should_save_task_successfully() throws Exception {
+        String jsonTask = "{\"name\":\"task\"," +
+                "\"content\":\"task list\"," +
+                "\"type\":\"life\"," +
+                "\"userId\":1}";
+
+        mockMvc.perform(post("/task", jsonTask)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonTask))
+                .andExpect(status().isCreated());
+//        verify(taskService).save(taskResource);
+    }
+
+    @Test
+    public void should_update_task_successfully() throws Exception {
+        String jsonTask = "{\"name\":\"task\"," +
+                "\"content\":\"task list\"," +
+                "\"type\":\"life\"," +
+                "\"taskId\":1," +
+                "\"userId\":1}";
+
+        mockMvc.perform(put("/task", jsonTask)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonTask))
+                .andExpect(status().isOk());
+
+//        verify(taskService).updateTask(taskResource);
+    }
+
+    @Test
+    public void should_return_todo_when_id_is_1L_and_userId_is_1L() throws Exception {
+        when(taskService.getById(1L, 1L)).thenReturn(task);
+
+        mockMvc.perform(get("/task/{id}/{userId}", 1L, 1L))
+                .andExpect(status().isOk());
+
+        verify(taskService).getById(1L, 1L);
+    }
+
+    @Test
+    public void should_cancel_order_successfully() throws Exception {
+        mockMvc.perform(patch("/task/{id}/{userId}", 1L, 1L))
+                .andExpect(status().isOk());
+
+        verify(taskService).deleteTask(1L, 1L);
+    }
+
+    @Test
+    public void should_return_all_task_when_given_userId() throws Exception {
+
+        mockMvc.perform(get("/task/{userId}", 1L))
+                .andExpect(status().isOk());
+
+        verify(taskService).getAllTask(1L);
+    }
+
+    @Test
+    public void should_return_all_task_when_given_userId_and_name() throws Exception {
+        mockMvc.perform(get("/task/name/{userId}/{name}", 1L, "task"))
+                .andExpect(status().isOk());
+
+        verify(taskService).getByName("task", 1L);
+    }
+
+    @Test
+    public void should_return_all_task_when_given_conditions() throws Exception {
+        String jsonTask = "{\"name\":\"task\"," +
+                "\"content\":\"task\"," +
+                "\"type\":\"life\"," +
+                "\"taskId\":1," +
+                "\"userId\":1}";
+        mockMvc.perform(get("/task/conditions", jsonTask)
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(jsonTask))
+                .andExpect(status().isOk());
+
+//        verify(taskService).getByConditions(multiConditonReSource);
+    }
+}
