@@ -69,7 +69,7 @@ public class TaskService {
                 taskAndJudge.setType(resource.getType());
                 return taskRepository.save(taskAndJudge);
             }else
-                throw new TaskNotFoundException("Task is not found!");
+                throw new TaskNotFoundException("User is not found!");
         }
         throw new TaskNotFoundException("Task is not found!");
     }

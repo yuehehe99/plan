@@ -19,12 +19,14 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -56,14 +58,14 @@ public class TaskServiceTest {
     private Page page;
     @Mock
     private MultiConditonReSource multiConditonReSource;
-    @Mock
-    private TaskNotFoundException taskNotFoundException;
-    @Rule
-    public final ExpectedException exception = ExpectedException.none();
+//    @Mock
+//    private TaskNotFoundException taskNotFoundException;
+//    @Rule
+//    public final ExpectedException exception = ExpectedException.none();
 
     @BeforeEach
     public void setUp() {
-        taskNotFoundException = new TaskNotFoundException("User is not found!");
+//        taskNotFoundException = new TaskNotFoundException("User is not found!");
         pageable = new Pageable() {
             @Override
             public int getPageNumber() {
@@ -266,16 +268,50 @@ public class TaskServiceTest {
         verify(taskRepository).save(task);
     }
 
-    //@Test
-    public void should_return_exception_when_save_and_given_wrong_userId() throws TaskNotFoundException {
-        when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(null);
-//        when(taskRepository.save(taskFake)).thenReturn(task);
-        exception.expect(NullPointerException.class);
-        exception.expectMessage("User is not found!");
+    @Test
+    public void should_return_exception_when_save_and_given_wrong_userId() {
+//        when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(null);
 
-        taskService.save(TaskResource.builder().userId(123456L).name("task").content("task list").build());
-
-        verify(userRepository).findByIdAndDeleted(123456L, false);
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.save(TaskResource.builder().userId(123456L).build()));
     }
+
+    @Test
+    public void should_return_exception_when_update_and_given_wrong_taskId() {
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.updateTask(TaskResource.builder().taskId(123456L).userId(1L).build()));
+    }
+
+    @Test
+    public void should_return_exception_when_update_and_given_wrong_userId() {
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.updateTask(TaskResource.builder().userId(123456L).build()));
+    }
+//    deleteTask
+//            getById
+//    getAllTask
+//    getByName
+
+    @Test
+    public void should_return_exception_when_delete_and_given_wrong_taskId() {
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.deleteTask(123456L,123456L));
+    }
+    @Test
+    public void should_return_exception_when_get_and_given_wrong_taskId() {
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.getById(123456L,123456L));
+    }
+    @Test
+    public void should_return_exception_when_getAll_and_given_wrong_userId() {
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.getAllTask(123456L));
+    }
+    @Test
+    public void should_return_exception_when_get_by_name_and_given_wrong_name() {
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.getByName("name",123456L));
+    }
+
 
 }
