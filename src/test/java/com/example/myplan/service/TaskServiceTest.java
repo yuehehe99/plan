@@ -7,11 +7,9 @@ import com.example.myplan.repository.TaskRepository;
 import com.example.myplan.repository.UserRepository;
 import com.example.myplan.resource.MultiConditonReSource;
 import com.example.myplan.resource.TaskResource;
-import org.junit.Rule;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.rules.ExpectedException;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
@@ -19,7 +17,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 
 import java.util.List;
 import java.util.Optional;
@@ -58,10 +55,6 @@ public class TaskServiceTest {
     private Page page;
     @Mock
     private MultiConditonReSource multiConditonReSource;
-//    @Mock
-//    private TaskNotFoundException taskNotFoundException;
-//    @Rule
-//    public final ExpectedException exception = ExpectedException.none();
 
     @BeforeEach
     public void setUp() {
@@ -287,10 +280,6 @@ public class TaskServiceTest {
         assertThrows(TaskNotFoundException.class,
                 () -> taskService.updateTask(TaskResource.builder().userId(123456L).build()));
     }
-//    deleteTask
-//            getById
-//    getAllTask
-//    getByName
 
     @Test
     public void should_return_exception_when_delete_and_given_wrong_taskId() {
