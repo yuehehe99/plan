@@ -12,12 +12,6 @@ import java.util.stream.Collectors;
 @ControllerAdvice
 public class GlobalExceptionHandler {
 
-//    @ExceptionHandler(MethodArgumentNotValidException.class)
-//    public String MethodArgumentNotValidExceptionHandler(MethodArgumentNotValidException exception){
-//        ObjectError objectError = exception.getBindingResult().getAllErrors().get(0);
-//        return objectError.getDefaultMessage();
-//    }
-
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<ErrorResult> argumentExceptionHandle(MethodArgumentNotValidException e){
         String message = e.getBindingResult().getAllErrors().stream()
@@ -29,7 +23,7 @@ public class GlobalExceptionHandler {
     }
 
     @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<ErrorResult> TodoNotFoundException(TaskNotFoundException e){
+    public ResponseEntity<ErrorResult> TaskNotFoundException(TaskNotFoundException e){
         ErrorResult apiError = ErrorResult.builder()
                 .message(e.getMessage())
                 .build();

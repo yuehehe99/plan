@@ -23,30 +23,30 @@ import org.springframework.web.bind.annotation.RestController;
 @AllArgsConstructor
 public class UserController {
 
-    private final UserService usersService;
+    private final UserService userService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public User addUser(@RequestBody UserResource resource) {
-        return usersService.save(resource);
+        return userService.save(resource);
     }
 
     @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
     public void deleteUser(@PathVariable Long id) {
-        usersService.deleteUser(id);
+        userService.deleteUser(id);
     }
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     public User UpdateTodo(@RequestBody UserResource dto) {
-        return usersService.UpdateUser(dto);
+        return userService.UpdateUser(dto);
     }
 
     @GetMapping("{id}")
     @ResponseStatus(HttpStatus.OK)
     public User getUser(@PathVariable Long id) {
-        return usersService.getUserAndJudge(id);
+        return userService.getUserAndJudge(id);
     }
 
 }
