@@ -18,6 +18,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -263,44 +264,62 @@ public class TaskServiceTest {
 
     @Test
     public void should_return_exception_when_save_and_given_wrong_userId() {
-//        when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(null);
+        when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(Optional.empty());
 
         assertThrows(TaskNotFoundException.class,
                 () -> taskService.save(TaskResource.builder().userId(123456L).build()));
+
+        verify(userRepository).findByIdAndDeleted(123456L, false);
     }
 
     @Test
     public void should_return_exception_when_update_and_given_wrong_taskId() {
+        when(taskRepository.findByIdAndDeleted(123456L,false)).thenReturn(Optional.empty());
+
         assertThrows(TaskNotFoundException.class,
                 () -> taskService.updateTask(TaskResource.builder().taskId(123456L).userId(1L).build()));
-    }
 
-    @Test
-    public void should_return_exception_when_update_and_given_wrong_userId() {
-        assertThrows(TaskNotFoundException.class,
-                () -> taskService.updateTask(TaskResource.builder().userId(123456L).build()));
+        verify(taskRepository).findByIdAndDeleted(123456L,false);
     }
 
     @Test
     public void should_return_exception_when_delete_and_given_wrong_taskId() {
+        when(taskRepository.findByIdAndDeleted(123456L,false)).thenReturn(Optional.empty());
+
         assertThrows(TaskNotFoundException.class,
-                () -> taskService.deleteTask(123456L,123456L));
-    }
-    @Test
-    public void should_return_exception_when_get_and_given_wrong_taskId() {
-        assertThrows(TaskNotFoundException.class,
-                () -> taskService.getById(123456L,123456L));
-    }
-    @Test
-    public void should_return_exception_when_getAll_and_given_wrong_userId() {
-        assertThrows(TaskNotFoundException.class,
-                () -> taskService.getAllTask(123456L));
-    }
-    @Test
-    public void should_return_exception_when_get_by_name_and_given_wrong_name() {
-        assertThrows(TaskNotFoundException.class,
-                () -> taskService.getByName("name",123456L));
+                () -> taskService.deleteTask(123456L, 123456L));
+
+        verify(taskRepository).findByIdAndDeleted(123456L,false);
     }
 
+    @Test
+    public void should_return_exception_when_get_and_given_wrong_taskId() {
+        when(taskRepository.findByIdAndDeleted(123456L,false)).thenReturn(Optional.empty());
+
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.getById(123456L, 123456L));
+
+        verify(taskRepository).findByIdAndDeleted(123456L,false);
+    }
+
+    @Test
+    public void should_return_exception_when_getAll_and_given_wrong_userId() {
+        when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(Optional.empty());
+
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.getAllTask(123456L));
+
+        verify(userRepository).findByIdAndDeleted(123456L, false);
+    }
+
+    @Test
+    public void should_return_exception_when_get_by_name_and_given_wrong_name() {
+        when(taskRepository.findAllByNameContaining("name")).thenReturn(Collections.emptyList());
+
+        assertThrows(TaskNotFoundException.class,
+                () -> taskService.getByName("name", 123456L));
+
+        verify(taskRepository).findAllByNameContaining("name");
+    }
 
 }
