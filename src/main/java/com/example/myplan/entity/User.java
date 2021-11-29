@@ -5,14 +5,14 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.LazyCollection;
+import org.hibernate.annotations.LazyCollectionOption;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.GeneratedValue;
-import javax.persistence.GenerationType;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 import javax.validation.constraints.NotBlank;
+import java.util.List;
+
+import static javax.persistence.CascadeType.ALL;
 
 @Entity
 @Table(name = "user")
@@ -30,6 +30,9 @@ public class User {
     @NotBlank(message = "name can not be blank!")
     private String name;
 
+    @NotBlank(message = "password can not be blank!")
+    private String password;
+
     @JsonIgnore
     @Column(columnDefinition = "TINYINT(1)")
     private boolean deleted;
@@ -37,4 +40,9 @@ public class User {
     @JsonIgnore
     @Column(columnDefinition = "TINYINT(1)")
     private boolean gender;
+
+    @OneToMany(cascade = ALL)
+    @LazyCollection(LazyCollectionOption.FALSE)
+    @JoinColumn(name = "id")
+    private List<Authority> authorities;
 }

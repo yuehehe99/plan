@@ -2,7 +2,7 @@ package com.example.myplan.service;
 
 import com.example.myplan.entity.Task;
 import com.example.myplan.entity.User;
-import com.example.myplan.exception.TaskNotFoundException;
+import com.example.myplan.exception.ResourceNotFoundException;
 import com.example.myplan.repository.TaskRepository;
 import com.example.myplan.repository.UserRepository;
 import com.example.myplan.resource.MultiConditonReSource;
@@ -12,6 +12,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -164,6 +165,7 @@ public class TaskServiceTest {
     @Test
     public void should_cancel_order_successfully() {
         when(taskRepository.findByIdAndDeleted(1L, false)).thenReturn(Optional.of(task));
+//        when(taskRepository.save(1L, false)).thenReturn(Optional.of(task));
 
         taskService.deleteTask(1L, 1L);
 
@@ -231,7 +233,7 @@ public class TaskServiceTest {
     //@Test
     public void should_return_task_when_given_conditions() {
         when(userRepository.findByIdAndDeleted(1L, false)).thenReturn(Optional.of(user));
-        when(taskRepository.findAll(specification, pageable)).thenReturn(page);
+        when(taskRepository.findAll(Mockito.mock(Specification.class), pageable)).thenReturn(page);
 
         Page<Task> find = taskService.getByConditions(multiConditonReSource);
 
@@ -266,7 +268,7 @@ public class TaskServiceTest {
     public void should_return_exception_when_save_and_given_wrong_userId() {
         when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(Optional.empty());
 
-        assertThrows(TaskNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> taskService.save(TaskResource.builder().userId(123456L).build()));
 
         verify(userRepository).findByIdAndDeleted(123456L, false);
@@ -276,7 +278,7 @@ public class TaskServiceTest {
     public void should_return_exception_when_update_and_given_wrong_taskId() {
         when(taskRepository.findByIdAndDeleted(123456L,false)).thenReturn(Optional.empty());
 
-        assertThrows(TaskNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> taskService.updateTask(TaskResource.builder().taskId(123456L).userId(1L).build()));
 
         verify(taskRepository).findByIdAndDeleted(123456L,false);
@@ -286,7 +288,7 @@ public class TaskServiceTest {
     public void should_return_exception_when_delete_and_given_wrong_taskId() {
         when(taskRepository.findByIdAndDeleted(123456L,false)).thenReturn(Optional.empty());
 
-        assertThrows(TaskNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> taskService.deleteTask(123456L, 123456L));
 
         verify(taskRepository).findByIdAndDeleted(123456L,false);
@@ -296,7 +298,7 @@ public class TaskServiceTest {
     public void should_return_exception_when_get_and_given_wrong_taskId() {
         when(taskRepository.findByIdAndDeleted(123456L,false)).thenReturn(Optional.empty());
 
-        assertThrows(TaskNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> taskService.getById(123456L, 123456L));
 
         verify(taskRepository).findByIdAndDeleted(123456L,false);
@@ -306,7 +308,7 @@ public class TaskServiceTest {
     public void should_return_exception_when_getAll_and_given_wrong_userId() {
         when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(Optional.empty());
 
-        assertThrows(TaskNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> taskService.getAllTask(123456L));
 
         verify(userRepository).findByIdAndDeleted(123456L, false);
@@ -316,7 +318,7 @@ public class TaskServiceTest {
     public void should_return_exception_when_get_by_name_and_given_wrong_name() {
         when(taskRepository.findAllByNameContaining("name")).thenReturn(Collections.emptyList());
 
-        assertThrows(TaskNotFoundException.class,
+        assertThrows(ResourceNotFoundException.class,
                 () -> taskService.getByName("name", 123456L));
 
         verify(taskRepository).findAllByNameContaining("name");

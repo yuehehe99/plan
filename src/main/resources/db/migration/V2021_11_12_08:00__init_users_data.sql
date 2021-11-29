@@ -1,0 +1,11 @@
+-- init users
+-- admin:123
+-- INSERT INTO user (id, name, password, deleted, gender)
+-- VALUES (1, 'admin', '{bcrypt}$2a$10$3TVm3V.Cijn0zoDAqIY/C./kFZDUgo9bugdTMuxXoh1COuR43.FUO', 0, 1);
+-- --
+-- -- init authorities
+-- INSERT INTO authorities (username, authority)
+-- VALUES ('admin', 'ROLE_ADMIN');
+--
+-- INSERT INTO task (id, user_id,name,content,type,deleted)
+-- VALUES (1, 1,'xiao','content','type',0);
