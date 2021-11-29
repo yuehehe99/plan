@@ -1,13 +1,15 @@
 package com.example.myplan.controller;
 
 import com.example.myplan.entity.Task;
-import com.example.myplan.exception.TaskNotFoundException;
+import com.example.myplan.exception.ResourceNotFoundException;
 import com.example.myplan.resource.MultiConditonReSource;
 import com.example.myplan.resource.TaskResource;
 import com.example.myplan.service.TaskService;
 import lombok.AllArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -29,6 +31,7 @@ public class TaskController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
+    @PreAuthorize("hasAnyRole('ADMIN', 'NORMAL')")
     public Task addTask(@RequestBody TaskResource resource) {
         return taskService.save(resource);
     }
@@ -53,6 +56,8 @@ public class TaskController {
      */
     @GetMapping("/{userId}")
     @ResponseStatus(HttpStatus.OK)
+    @PreAuthorize("hasAnyRole('ADMIN', 'NORMAL')")
+    @PostFilter("filterObject.user.name == authentication.name or hasRole('ADMIN')")
     public List<Task> getAllTask(@PathVariable Long userId) {
         return taskService.getAllTask(userId);
     }
@@ -63,11 +68,11 @@ public class TaskController {
      * @param id
      * @param userId
      * @return
-     * @throws TaskNotFoundException
+     * @throws ResourceNotFoundException
      */
     @GetMapping("/{userId}/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Task getTask(@PathVariable Long id, @PathVariable Long userId) throws TaskNotFoundException {
+    public Task getTask(@PathVariable Long id, @PathVariable Long userId) throws ResourceNotFoundException {
         return taskService.getById(id, userId);
     }
 

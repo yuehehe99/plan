@@ -1,10 +1,8 @@
 package com.example.myplan.repository;
 
 import com.example.myplan.entity.Task;
-import com.example.myplan.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.data.repository.PagingAndSortingRepository;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
