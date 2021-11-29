@@ -13,7 +13,7 @@ import java.util.stream.Collectors;
 public class GlobalExceptionHandler {
 
     @ExceptionHandler(MethodArgumentNotValidException.class)
-    public ResponseEntity<ErrorResult> argumentExceptionHandle(MethodArgumentNotValidException e){
+    public ResponseEntity<ErrorResult> argumentExceptionHandle(MethodArgumentNotValidException e) {
         String message = e.getBindingResult().getAllErrors().stream()
                 .map(DefaultMessageSourceResolvable::getDefaultMessage)
                 .collect(Collectors.joining("."));
@@ -22,12 +22,20 @@ public class GlobalExceptionHandler {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(errorResult);
     }
 
-    @ExceptionHandler(TaskNotFoundException.class)
-    public ResponseEntity<ErrorResult> TaskNotFoundException(TaskNotFoundException e){
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResult> TaskNotFoundException(ResourceNotFoundException e) {
         ErrorResult apiError = ErrorResult.builder()
                 .message(e.getMessage())
                 .build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).body(apiError);
+    }
+
+    @ExceptionHandler(RepeatRegisterException.class)
+    public ResponseEntity<ErrorResult> RepeatRegisterException(RepeatRegisterException e) {
+        ErrorResult apiError = ErrorResult.builder()
+                .message(e.getMessage())
+                .build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(apiError);
     }
 
 }
