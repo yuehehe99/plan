@@ -43,8 +43,8 @@ public class UserController {
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN')")
-    public User updateUser(@RequestBody UserResource dto) {
-        return userService.updateUser(dto);
+    public User updateUser(@RequestBody UserResource resource) {
+        return userService.updateUser(resource);
     }
 
     @GetMapping

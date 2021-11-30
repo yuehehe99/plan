@@ -96,6 +96,7 @@ public class TaskController {
      */
     @GetMapping("/name/{userId}/{name}")
     @ResponseStatus(HttpStatus.OK)
+    @PostFilter("filterObject.user.name == authentication.name or hasRole('ADMIN')")
     public List<Task> getTaskByName(@PathVariable String name, @PathVariable Long userId) {
         return taskService.getByName(name, userId);
     }

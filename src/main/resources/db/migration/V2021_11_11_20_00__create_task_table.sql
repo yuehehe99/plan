@@ -3,7 +3,7 @@ DROP TABLE IF EXISTS `task`;
 CREATE TABLE task
 (
     `id`         bigint(20) NOT NULL auto_increment,
-    `user_id`   bigint(20) NOT NUll,
+    `user_id`    bigint(20) NOT NUll,
     `name`       VARCHAR(20) NOT NULL,
     `content`    VARCHAR(30),
     `type`       VARCHAR(30),
