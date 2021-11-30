@@ -25,9 +25,8 @@ public class UserService {
     private final PasswordEncoder passwordEncoder;
 
     public User save(UserResource resource) {
-        Optional<User> byName = userRepository.findByName(resource.getName());
-//        User byNameUser = byName.isEmpty() ? null : byName.get();
-        if(!byName.equals(Optional.empty()))
+        User user = getUserAndJudge(resource.getName());
+        if (null != user)
             throw new RepeatRegisterException("Repeat register user");
 
         return userRepository.save(
@@ -39,35 +38,34 @@ public class UserService {
                         .build());
     }
 
+    public User getUserAndJudge(String name) {
+        Optional<User> byId = userRepository.findByName(name);
+        return byId.isEmpty() ? null : byId.get();
+    }
 
     public void deleteUser(Long id) {
-        User userAndJudge = getUserAndJudge(id);
-        if (!userAndJudge.equals(null)) {
-            userAndJudge.setDeleted(true);
-            userRepository.save(userAndJudge);
-
-            List<Task> allTask = taskService.getAllTask(userAndJudge.getId());
+        User user = userRepository.findByIdAndDeleted(id, false);
+        if (null != user) {
+            List<Task> allTask = taskService.getAllTask(user.getId());
             allTask.forEach(task -> {
                 task.setDeleted(true);
                 taskRepository.save(task);
             });
-        }
-        throw new ResourceNotFoundException("User is not found!");
+
+            user.setDeleted(true);
+            userRepository.save(user);
+        } else
+            throw new ResourceNotFoundException("User is not found!");
     }
 
     public User updateUser(UserResource resource) {
-        User userAndJudge = getUserAndJudge(resource.getId());
-        if (!userAndJudge.equals(null)) {
-            userAndJudge.setName(resource.getName());
-            userAndJudge.setPassword(resource.getPassword());
-            return userRepository.save(userAndJudge);
+        User user = userRepository.findByIdAndDeleted(resource.getUserId(), false);
+        if (null != user) {
+//            user.setName(resource.getName());
+            user.setPassword(passwordEncoder.encode(resource.getPassword()));
+            return userRepository.save(user);
         }
         throw new ResourceNotFoundException("User is not found!");
-    }
-
-    public User getUserAndJudge(Long id) {
-        Optional<User> byId = userRepository.findById(id);
-        return byId.isEmpty() ? null : byId.get();
     }
 
     public List<User> getAllUsers() {
