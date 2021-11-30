@@ -146,7 +146,5 @@ public class TaskControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonTask))
                 .andExpect(status().isOk());
-
-//        verify(taskService).getByConditions(multiConditonReSource);
     }
 }

@@ -45,11 +45,8 @@ public class TaskServiceTest {
     private TaskResource taskResource;
 
     @Mock
-    private Specification specification;
-    @Mock
     private Pageable pageable;
-    @Mock
-    private Page page;
+
     @Mock
     private MultiConditonReSource multiConditonReSource;
 
@@ -63,7 +60,7 @@ public class TaskServiceTest {
 
             @Override
             public int getPageSize() {
-                return 4;
+                return 2;
             }
 
             @Override
@@ -96,9 +93,6 @@ public class TaskServiceTest {
                 return false;
             }
         };
-
-        specification.equals(multiConditonReSource);
-
         multiConditonReSource = MultiConditonReSource.builder()
                 .name("task")
                 .content("task")
@@ -213,10 +207,10 @@ public class TaskServiceTest {
      * );
      * -> at com.example.myplan.service.TaskService.getByConditions(TaskService.java:137)
      */
-    //@Test
+    @Test
     public void should_return_task_when_given_conditions() {
         when(userRepository.findByIdAndDeleted(1L, false)).thenReturn(user);
-        when(taskRepository.findAll(Mockito.mock(Specification.class), pageable)).thenReturn(page);
+//        when(taskRepository.findAll(Mockito.mock(Specification.class), pageable)).thenReturn(Mockito.mock(Page.class));
 
         Page<Task> find = taskService.getByConditions(multiConditonReSource);
 
