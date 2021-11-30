@@ -10,6 +10,7 @@ import org.springframework.data.domain.Page;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.access.prepost.PostFilter;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -36,10 +37,12 @@ public class TaskController {
         return taskService.save(resource);
     }
 
-    @PatchMapping("/{userId}/{id}")
+    @PatchMapping("/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public void deleteTask(@PathVariable Long id, @PathVariable Long userId) throws Exception {
-        taskService.deleteTask(id, userId);
+    public void deleteTask(@PathVariable Long id) throws Exception {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        if ("" != name && !name.isEmpty())
+            taskService.deleteTask(id, name);
     }
 
     @PutMapping

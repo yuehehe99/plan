@@ -112,10 +112,10 @@ public class TaskControllerTest {
 
     @Test
     public void should_cancel_order_successfully() throws Exception {
-        mockMvc.perform(patch("/task/{id}/{userId}", 1L, 1L))
+        mockMvc.perform(patch("/task/{id}", 1L, 1L))
                 .andExpect(status().isOk());
 
-        verify(taskService).deleteTask(1L, 1L);
+        verify(taskService).deleteTask(1L,"admin");
     }
 
     @Test

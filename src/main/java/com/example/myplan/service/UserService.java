@@ -62,7 +62,8 @@ public class UserService {
         User user = userRepository.findByIdAndDeleted(resource.getUserId(), false);
         if (null != user) {
 //            user.setName(resource.getName());
-            user.setPassword(passwordEncoder.encode(resource.getPassword()));
+//            user.setAuthorities(Collections.singletonList(new Authority(resource.getName(), "ROLE_NORMAL")));
+            user.setPassword(null == resource.getPassword() ? passwordEncoder.encode(user.getPassword()) : user.getPassword());
             return userRepository.save(user);
         }
         throw new ResourceNotFoundException("User is not found!");

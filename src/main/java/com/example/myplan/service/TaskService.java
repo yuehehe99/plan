@@ -41,11 +41,18 @@ public class TaskService {
         throw new ResourceNotFoundException("User is not found!");
     }
 
-    public void deleteTask(Long id, Long userId) {
+    public void deleteTask(Long id, String name) {
+        Optional<User> byName = userRepository.findByName(name);
+        User user = byName.isEmpty() ? null : byName.get();
         Task task = taskRepository.findByIdAndDeleted(id, false);
-        if (null != task) {
-            task.setDeleted(userId.equals(task.getUser().getId()) || task.isDeleted());
-            taskRepository.save(task);
+
+        if (null != task && null != user) {
+            boolean equals = user.getId().equals(task.getUser().getId());
+            if (equals) {
+                task.setDeleted(equals || task.isDeleted());
+                taskRepository.save(task);
+            } else
+                throw new ResourceNotFoundException("You can not delete other's task!");
         } else
             throw new ResourceNotFoundException("Task is not found!");
     }

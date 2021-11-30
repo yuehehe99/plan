@@ -21,6 +21,7 @@ import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
@@ -106,7 +107,7 @@ public class TaskServiceTest {
         user = User.builder()
                 .id(1L)
                 .gender(false)
-                .name("ming")
+                .name("admin")
                 .gender(false)
                 .build();
 
@@ -139,12 +140,14 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void should_cancel_order_successfully() {
+    public void should_cancel_task_successfully() {
+        when(userRepository.findByName("admin")).thenReturn(Optional.ofNullable(user));
         when(taskRepository.findByIdAndDeleted(1L, false)).thenReturn(task);
         when(taskRepository.save(task)).thenReturn(task);
 
-        taskService.deleteTask(1L, 1L);
+        taskService.deleteTask(1L, "admin");
 
+        verify(userRepository).findByName("admin");
         verify(taskRepository).findByIdAndDeleted(1L, false);
         verify(taskRepository).save(task);
     }
@@ -231,17 +234,6 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void should_cancel_ask_successfully() throws Exception {
-        when(taskRepository.findByIdAndDeleted(1L, false)).thenReturn(task);
-        when(taskRepository.save(task)).thenReturn(task);
-
-        taskService.deleteTask(1L, 1L);
-
-        verify(taskRepository).findByIdAndDeleted(1L, false);
-        verify(taskRepository).save(task);
-    }
-
-    @Test
     public void should_return_exception_when_save_and_given_wrong_userId() {
         when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(null);
 
@@ -276,7 +268,7 @@ public class TaskServiceTest {
         when(taskRepository.findByIdAndDeleted(123456L,false)).thenReturn(null);
 
         assertThrows(ResourceNotFoundException.class,
-                () -> taskService.deleteTask(123456L, 123456L));
+                () -> taskService.deleteTask(123456L, "admin"));
 
         verify(taskRepository).findByIdAndDeleted(123456L,false);
     }
