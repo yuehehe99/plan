@@ -16,10 +16,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.http.MediaType;
+import org.springframework.security.test.context.support.WithMockUser;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-
-import java.util.Optional;
 
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -29,6 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
+@WithMockUser(username = "admin", password = "1234", authorities = {"ROLE_NORMAL"})
 public class TaskControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -36,13 +36,10 @@ public class TaskControllerTest {
     @MockBean
     private TaskService taskService;
 
-    private TaskRepository taskRepository;
-
     private MultiConditonReSource multiConditonReSource;
 
     private Task task;
     private User user;
-    private TaskResource taskResource;
 
     @Before
     public void setUp() {
@@ -57,6 +54,7 @@ public class TaskControllerTest {
                 .id(1L)
                 .name("xiao")
                 .deleted(false)
+                .password("1234")
                 .gender(false)
                 .build();
 
@@ -65,13 +63,6 @@ public class TaskControllerTest {
                 .name("task")
                 .content("task list")
                 .type("life")
-                .build();
-        taskResource = TaskResource.builder()
-                .name("task")
-                .content("task list")
-                .type("life")
-                .userId(1L)
-                .taskId(1L)
                 .build();
     }
 
@@ -91,7 +82,6 @@ public class TaskControllerTest {
                         .contentType(MediaType.APPLICATION_JSON)
                         .content(jsonTask))
                 .andExpect(status().isCreated());
-//        verify(taskService).save(taskResource);
     }
 
     @Test
