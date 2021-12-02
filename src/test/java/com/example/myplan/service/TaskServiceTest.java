@@ -12,11 +12,9 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
-import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 
 import java.util.Collections;
@@ -26,6 +24,7 @@ import java.util.Optional;
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.mockito.Mockito.any;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -38,62 +37,16 @@ public class TaskServiceTest {
     private TaskRepository taskRepository;
     @Mock
     private UserRepository userRepository;
-    @Mock
+
     private Task task;
-    @Mock
     private User user;
-    @Mock
+
     private TaskResource taskResource;
 
-    @Mock
-    private Pageable pageable;
-
-    @Mock
     private MultiConditonReSource multiConditonReSource;
 
     @BeforeEach
     public void setUp() {
-        pageable = new Pageable() {
-            @Override
-            public int getPageNumber() {
-                return 0;
-            }
-
-            @Override
-            public int getPageSize() {
-                return 2;
-            }
-
-            @Override
-            public long getOffset() {
-                return 0;
-            }
-
-            @Override
-            public Sort getSort() {
-                return null;
-            }
-
-            @Override
-            public Pageable next() {
-                return null;
-            }
-
-            @Override
-            public Pageable previousOrFirst() {
-                return null;
-            }
-
-            @Override
-            public Pageable first() {
-                return null;
-            }
-
-            @Override
-            public boolean hasPrevious() {
-                return false;
-            }
-        };
         multiConditonReSource = MultiConditonReSource.builder()
                 .name("task")
                 .content("task")
@@ -213,12 +166,12 @@ public class TaskServiceTest {
     @Test
     public void should_return_task_when_given_conditions() {
         when(userRepository.findByIdAndDeleted(1L, false)).thenReturn(user);
-//        when(taskRepository.findAll(Mockito.mock(Specification.class), pageable)).thenReturn(Mockito.mock(Page.class));
+//        when(taskRepository.findAll(any(Specification.class), any(Pageable.class))).thenReturn(any(Page.class));
 
         Page<Task> find = taskService.getByConditions(multiConditonReSource);
 
         verify(userRepository).findByIdAndDeleted(1L, false);
-//        verify(taskRepository).findAll(specification, pageable);
+        verify(taskRepository).findAll(any(Specification.class), any(Pageable.class));
     }
 
     @Test

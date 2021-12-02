@@ -1,0 +1,23 @@
+version: '3'
+
+services:
+  myplan1:
+    build: . #Dockerfile文件路径 build  对应命令 docker build
+    image: myplan1:1.0
+    container_name: myplan1
+    ports:
+      - '8080:8080'
+    depends_on:
+      - mysql
+
+  mysql:
+    image: mysql:8.0
+    container_name: mysql
+    environment:
+      MYSQL_DATABASE: 'myplan'
+      MYSQL_ROOT_PASSWORD: 'root'
+      MYSQL_PASSWORD: 'pass'
+    ports:
+      - "3306:3306"
+    volumes:
+      - $PWD/data:/var/lib/mysql
