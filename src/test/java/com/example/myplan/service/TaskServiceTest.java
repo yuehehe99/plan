@@ -73,7 +73,6 @@ public class TaskServiceTest {
         taskResource = TaskResource.builder()
                 .name("task")
                 .content("task list")
-                .userId(1L)
                 .taskId(1L)
                 .build();
 
@@ -81,14 +80,14 @@ public class TaskServiceTest {
 
     @Test
     public void should_return_task_when_save_task() {
-        when(userRepository.findByIdAndDeleted(1L, false)).thenReturn(user);
+        when(userRepository.findByName("admin")).thenReturn(Optional.ofNullable(user));
         when(taskRepository.save(task)).thenReturn(task);
 
-        Task save = taskService.save(taskResource);
+        List<Task> save = taskService.save(taskResource,"admin");
 
-        assertThat(save).isEqualTo(task);
+        assertThat(save.get(0)).isEqualTo(task);
         assertNotNull(save);
-        verify(userRepository).findByIdAndDeleted(1L, false);
+        verify(userRepository).findByName("admin");
         verify(taskRepository).save(task);
     }
 
@@ -110,59 +109,47 @@ public class TaskServiceTest {
         when(taskRepository.findByIdAndDeleted(1L, false)).thenReturn(task);
         when(taskRepository.save(task)).thenReturn(task);
 
-        Task update = taskService.updateTask(taskResource);
+        List<Task> update = taskService.updateTask(taskResource);
 
-        assertThat(update).isEqualTo(task);
+        assertThat(update.get(0)).isEqualTo(task);
         verify(taskRepository).save(task);
     }
 
     @Test
-    public void should_return_task_when_given_task_id_and_user_id() {
+    public void should_return_task_when_given_task_id() {
+        when(userRepository.findByName("admin")).thenReturn(Optional.ofNullable(user));
         when(taskRepository.findByIdAndDeleted(1L, false)).thenReturn(task);
 
-        Task find = taskService.getById(1L, 1L);
+        Task find = taskService.getById(1L, "admin");
 
         assertThat(find.getId()).isEqualTo(task.getId());
+        verify(userRepository).findByName("admin");
         verify(taskRepository).findByIdAndDeleted(1L, false);
     }
 
     @Test
     public void should_return_all_task_when_given_userId() throws Exception {
-        when(userRepository.findByIdAndDeleted(1L, false)).thenReturn(user);
-        when(taskRepository.findTasksByUserIdAndDeleted(1L, false)).thenReturn(List.of(task));
+//        when(userRepository.findByIdAndDeleted(1L, false)).thenReturn(user);
+        when(taskRepository.findAll()).thenReturn(List.of(task));
 
-        List<Task> find = taskService.getAllTask(1L);
+        List<Task> find = taskService.getAllTask();
 
+        assertThat(find.contains(task));
         assertThat(find.get(0).getId()).isEqualTo(task.getId());
-        verify(userRepository).findByIdAndDeleted(1L, false);
-        verify(taskRepository).findTasksByUserIdAndDeleted(1L, false);
+//        verify(userRepository).findByIdAndDeleted(1L, false);
+        verify(taskRepository).findAll();
     }
 
     @Test
     public void should_return_task_when_given_task_name_and_user_id() {
         when(taskRepository.findAllByNameContaining("task")).thenReturn(List.of(task));
 
-        List<Task> find = taskService.getByName("task", 1L);
+        List<Task> find = taskService.getByName("task");
 
         assertThat(find.contains(task));
         verify(taskRepository).findAllByNameContaining("task");
     }
 
-    /**
-     * conditions
-     * Argument(s) are different! Wanted:
-     * taskRepository.findAll(
-     * specification,
-     * com.example.myplan.service.TaskServiceTest$1@ba4c99c
-     * );
-     * -> at com.example.myplan.service.TaskServiceTest.should_return_task_when_given_conditions(TaskServiceTest.java:226)
-     * Actual invocations have different arguments:
-     * taskRepository.findAll(
-     * com.example.myplan.service.TaskService$$Lambda$1547/0x0000000800b0f840@3bd552f7,
-     * Page request [number: 0, size 2, sort: createdAt: DESC]
-     * );
-     * -> at com.example.myplan.service.TaskService.getByConditions(TaskService.java:137)
-     */
     @Test
     public void should_return_task_when_given_conditions() {
         when(userRepository.findByIdAndDeleted(1L, false)).thenReturn(user);
@@ -172,28 +159,6 @@ public class TaskServiceTest {
 
         verify(userRepository).findByIdAndDeleted(1L, false);
         verify(taskRepository).findAll(any(Specification.class), any(Pageable.class));
-    }
-
-    @Test
-    public void should_return_all_task_when_given_user_id() {
-        when(userRepository.findByIdAndDeleted(1L, false)).thenReturn(user);
-        when(taskRepository.findTasksByUserIdAndDeleted(1L, false)).thenReturn(List.of(task));
-
-        List<Task> find = taskService.getAllTask(1L);
-
-        assertThat(find.contains(task));
-        verify(userRepository).findByIdAndDeleted(1L, false);
-        verify(taskRepository).findTasksByUserIdAndDeleted(1L, false);
-    }
-
-    @Test
-    public void should_return_exception_when_save_and_given_wrong_userId() {
-        when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(null);
-
-        assertThrows(ResourceNotFoundException.class,
-                () -> taskService.save(TaskResource.builder().userId(123456L).build()));
-
-        verify(userRepository).findByIdAndDeleted(123456L, false);
     }
 
     @Test
@@ -207,16 +172,6 @@ public class TaskServiceTest {
     }
 
     @Test
-    public void should_return_exception_when_update_and_given_wrong_userId() {
-        when(taskRepository.findByIdAndDeleted(1L,false)).thenReturn(task);
-
-        assertThrows(ResourceNotFoundException.class,
-                () -> taskService.updateTask(TaskResource.builder().taskId(1L).userId(123456L).build()));
-
-        verify(taskRepository).findByIdAndDeleted(1L,false);
-    }
-
-    @Test
     public void should_return_exception_when_delete_and_given_wrong_taskId() {
         when(taskRepository.findByIdAndDeleted(123456L,false)).thenReturn(null);
 
@@ -227,34 +182,33 @@ public class TaskServiceTest {
     }
 
     @Test
+    public void should_return_exception_when_delete_and_given_wrong_user() {
+        when(taskRepository.findByIdAndDeleted(1L,false)).thenReturn(null);
+
+        assertThrows(ResourceNotFoundException.class,
+                () -> taskService.deleteTask(1L, "haha"));
+
+        verify(taskRepository).findByIdAndDeleted(1L,false);
+    }
+
+    @Test
     public void should_return_exception_when_get_and_given_wrong_taskId() {
         when(taskRepository.findByIdAndDeleted(123456L,false)).thenReturn(null);
 
         assertThrows(ResourceNotFoundException.class,
-                () -> taskService.getById(123456L, 123456L));
+                () -> taskService.getById(123456L, "admin"));
 
         verify(taskRepository).findByIdAndDeleted(123456L,false);
     }
 
     @Test
-    public void should_return_exception_when_getAll_and_given_wrong_userId() {
-        when(userRepository.findByIdAndDeleted(123456L, false)).thenReturn(null);
+    public void should_return_exception_when_get_and_given_wrong_user() {
+        when(taskRepository.findByIdAndDeleted(1L,false)).thenReturn(null);
 
         assertThrows(ResourceNotFoundException.class,
-                () -> taskService.getAllTask(123456L));
+                () -> taskService.getById(1L, "haha"));
 
-        verify(userRepository).findByIdAndDeleted(123456L, false);
+        verify(taskRepository).findByIdAndDeleted(1L,false);
     }
-
-    @Test
-    public void should_return_exception_when_get_by_name_and_given_wrong_name() {
-        when(taskRepository.findAllByNameContaining("name")).thenReturn(Collections.emptyList());
-
-        assertThrows(ResourceNotFoundException.class,
-                () -> taskService.getByName("name", 123456L));
-
-        verify(taskRepository).findAllByNameContaining("name");
-    }
-
 
 }

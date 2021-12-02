@@ -34,9 +34,10 @@ public class SecurityConfiguration extends WebSecurityConfigurerAdapter {
                 .mvcMatchers(HttpMethod.PATCH, "/task/*").access("hasRole('ADMIN') or hasRole('NORMAL')")
                 .mvcMatchers(HttpMethod.PATCH, "/task/*/*").access("hasRole('ADMIN') or hasRole('NORMAL')")
                 .mvcMatchers(HttpMethod.GET,"/user").access("hasRole('ADMIN') or hasRole('NORMAL')")
-                .mvcMatchers(HttpMethod.GET,"/task/*").access("hasRole('ADMIN') or hasRole('NORMAL')")
+                .mvcMatchers(HttpMethod.GET,"/task").access("hasRole('ADMIN') or hasRole('NORMAL')")
                 .mvcMatchers(HttpMethod.GET,"/task/*/*").access("hasRole('ADMIN') or hasRole('NORMAL')")
-                .mvcMatchers(HttpMethod.GET,"/task/name/*/*").access("hasRole('ADMIN') or hasRole('NORMAL')")
+                .mvcMatchers(HttpMethod.GET,"/task/name/*").access("hasRole('ADMIN') or hasRole('NORMAL')")
+                .mvcMatchers(HttpMethod.GET,"/task/conditions").access("hasRole('ADMIN') or hasRole('NORMAL')")
                 .mvcMatchers(HttpMethod.PUT,"/user").access("hasRole('ADMIN') or hasRole('NORMAL')")
                 .mvcMatchers(HttpMethod.PUT,"/task").access("hasRole('ADMIN') or hasRole('NORMAL')")
                 .anyRequest().denyAll() //任何尚未匹配的 URL 都将被拒绝访问

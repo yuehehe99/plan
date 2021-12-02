@@ -28,7 +28,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest
 @RunWith(SpringRunner.class)
 @AutoConfigureMockMvc
-@WithMockUser(username = "admin", password = "1234", authorities = {"ROLE_NORMAL"})
+@WithMockUser(username = "admin", password = "1234", authorities = {"ROLE_ADMIN"})
 public class TaskControllerTest {
     @Autowired
     private MockMvc mockMvc;
@@ -101,18 +101,18 @@ public class TaskControllerTest {
     }
 
     @Test
-    public void should_return_todo_when_id_is_1L_and_userId_is_1L() throws Exception {
-        when(taskService.getById(1L, 1L)).thenReturn(task);
+    public void should_return_task_when_id_is_1L_and_user_is_admin() throws Exception {
+        when(taskService.getById(1L, "admin")).thenReturn(task);
 
-        mockMvc.perform(get("/task/{id}/{userId}", 1L, 1L))
+        mockMvc.perform(get("/task/one/{id}", 1L))
                 .andExpect(status().isOk());
 
-        verify(taskService).getById(1L, 1L);
+        verify(taskService).getById(1L, "admin");
     }
 
     @Test
     public void should_cancel_order_successfully() throws Exception {
-        mockMvc.perform(patch("/task/{id}", 1L, 1L))
+        mockMvc.perform(patch("/task/{id}", 1L))
                 .andExpect(status().isOk());
 
         verify(taskService).deleteTask(1L,"admin");
@@ -121,18 +121,18 @@ public class TaskControllerTest {
     @Test
     public void should_return_all_task_when_given_userId() throws Exception {
 
-        mockMvc.perform(get("/task/{userId}", 1L))
+        mockMvc.perform(get("/task", 1L))
                 .andExpect(status().isOk());
 
-        verify(taskService).getAllTask(1L);
+        verify(taskService).getAllTask();
     }
 
     @Test
     public void should_return_all_task_when_given_userId_and_name() throws Exception {
-        mockMvc.perform(get("/task/name/{userId}/{name}", 1L, "task"))
+        mockMvc.perform(get("/task/name/{name}", "task"))
                 .andExpect(status().isOk());
 
-        verify(taskService).getByName("task", 1L);
+        verify(taskService).getByName("task");
     }
 
     @Test

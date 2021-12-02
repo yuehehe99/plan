@@ -33,8 +33,13 @@ public class TaskController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     @PreAuthorize("hasAnyRole('ADMIN', 'NORMAL')")
-    public Task addTask(@RequestBody TaskResource resource) {
-        return taskService.save(resource);
+    public List<Task> addTask(@RequestBody TaskResource resource) {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        if ("" != name && !name.isEmpty())
+            return taskService.save(resource, name);
+        else
+            throw new ResourceNotFoundException("invalid user");
+
     }
 
     @PatchMapping("/{id}")
@@ -47,36 +52,38 @@ public class TaskController {
 
     @PutMapping
     @ResponseStatus(HttpStatus.OK)
-    public Task updateTask(@RequestBody TaskResource dto) throws Exception {
-        return taskService.updateTask(dto);
+    @PostFilter("filterObject.user.name == authentication.name or hasRole('ADMIN')")
+    public List<Task> updateTask(@RequestBody TaskResource resource) throws Exception {
+        return taskService.updateTask(resource);
     }
 
     /**
      * 查询所有
-     *
-     * @param userId
      * @return
      */
-    @GetMapping("/{userId}")
+    @GetMapping
     @ResponseStatus(HttpStatus.OK)
     @PreAuthorize("hasAnyRole('ADMIN', 'NORMAL')")
     @PostFilter("filterObject.user.name == authentication.name or hasRole('ADMIN')")
-    public List<Task> getAllTask(@PathVariable Long userId) {
-        return taskService.getAllTask(userId);
+    public List<Task> getAllTask() {
+        return taskService.getAllTask();
     }
 
     /**
      * 根据id查询
      *
      * @param id
-     * @param userId
      * @return
      * @throws ResourceNotFoundException
      */
-    @GetMapping("/{userId}/{id}")
+    @GetMapping("/one/{id}")
     @ResponseStatus(HttpStatus.OK)
-    public Task getTask(@PathVariable Long id, @PathVariable Long userId) throws ResourceNotFoundException {
-        return taskService.getById(id, userId);
+    public Task getTask(@PathVariable Long id) throws ResourceNotFoundException {
+        String name = SecurityContextHolder.getContext().getAuthentication().getName();
+        if ("" != name && !name.isEmpty())
+            return taskService.getById(id, name);
+        else
+            throw new ResourceNotFoundException("invalid user");
     }
 
     /**
@@ -94,14 +101,13 @@ public class TaskController {
      * 根据name单条件模糊查询
      *
      * @param name
-     * @param userId
      * @return
      */
-    @GetMapping("/name/{userId}/{name}")
+    @GetMapping("/name/{name}")
     @ResponseStatus(HttpStatus.OK)
     @PostFilter("filterObject.user.name == authentication.name or hasRole('ADMIN')")
-    public List<Task> getTaskByName(@PathVariable String name, @PathVariable Long userId) {
-        return taskService.getByName(name, userId);
+    public List<Task> getTaskByName(@PathVariable String name) {
+        return taskService.getByName(name);
     }
 }
 

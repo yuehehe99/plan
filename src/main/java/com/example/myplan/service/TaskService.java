@@ -13,13 +13,15 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.security.access.prepost.PostFilter;
+import org.springframework.security.authentication.jaas.SecurityContextLoginModule;
+import org.springframework.security.config.annotation.web.configurers.SecurityContextConfigurer;
+import org.springframework.security.core.context.SecurityContext;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import javax.persistence.criteria.Predicate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -28,16 +30,19 @@ public class TaskService {
     private final TaskRepository taskRepository;
     private final UserRepository userRepository;
 
-    public Task save(TaskResource resource) {
-        User user = userRepository.findByIdAndDeleted(resource.getUserId(), false);
-        if (null != user)
-            return taskRepository.save(Task.builder()
+    public List<Task> save(TaskResource resource, String name) {
+        Optional<User> byName = userRepository.findByName(name);
+        User user = byName.isEmpty() ? null : byName.get();
+        if (null != user) {
+            List<Task> result = new ArrayList<>();
+            result.add(taskRepository.save(Task.builder()
                     .content(resource.getContent())
                     .name(resource.getName())
                     .type(resource.getType())
                     .user(user)
-                    .build());
-
+                    .build()));
+            return result;
+        }
         throw new ResourceNotFoundException("User is not found!");
     }
 
@@ -45,7 +50,6 @@ public class TaskService {
         Optional<User> byName = userRepository.findByName(name);
         User user = byName.isEmpty() ? null : byName.get();
         Task task = taskRepository.findByIdAndDeleted(id, false);
-
         if (null != task && null != user) {
             boolean equals = user.getId().equals(task.getUser().getId());
             if (equals) {
@@ -57,44 +61,46 @@ public class TaskService {
             throw new ResourceNotFoundException("Task is not found!");
     }
 
-    public Task updateTask(TaskResource resource) {
+    public List<Task> updateTask(TaskResource resource) {
         Task task = taskRepository.findByIdAndDeleted(resource.getTaskId(), false);
         if (null != task) {
-            if (Objects.equals(task.getUser().getId(), resource.getUserId())) {
-                task.setName(resource.getName());
-                task.setContent(resource.getContent());
-                task.setType(resource.getType());
-                return taskRepository.save(task);
-            } else
-                throw new ResourceNotFoundException("User is not found!");
+            task.setName((null == resource.getName()) ? task.getName() : resource.getName());
+            task.setContent((null == resource.getContent()) ? task.getContent() : resource.getContent());
+            task.setType((null == resource.getType()) ? task.getType() : resource.getType());
+            taskRepository.save(task);
+            List<Task> result = new ArrayList<>();
+            result.add(task);
+            return result;
         }
         throw new ResourceNotFoundException("Task is not found!");
     }
 
-    public Task getById(Long id, Long userId) {
+    public Task getById(Long id, String name) {
+        Optional<User> byName = userRepository.findByName(name);
+        User user = byName.isEmpty() ? null : byName.get();
         Task task = taskRepository.findByIdAndDeleted(id, false);
-        if (null != task) {
-            return userId.equals(task.getUser().getId()) ? task : null;
+        if (null != task && null != user) {
+            if (user.getId().equals(task.getUser().getId()))
+                return task;
+            else
+                throw new ResourceNotFoundException("You can not get other's task!");
+        } else
+            throw new ResourceNotFoundException("Task is not found!");
+    }
+
+    public List<Task> getAllTask() {
+        return taskRepository.findAll();
+    }
+
+    public List<Task> getByName(String name) {
+        List<Task> allByNameContaining = taskRepository.findAllByNameContaining(name);
+        if (!allByNameContaining.isEmpty()) {
+            List<Task> list = new ArrayList<>();
+            list.addAll(allByNameContaining);
+            return list;
         }
         throw new ResourceNotFoundException("Task is not found!");
-    }
 
-    public List<Task> getAllTask(Long userId) {
-        User user = userRepository.findByIdAndDeleted(userId, false);
-        if (null != user)
-            return taskRepository.findTasksByUserIdAndDeleted(userId, false);
-
-        throw new ResourceNotFoundException("User is not found!");
-    }
-
-    public List<Task> getByName(String name, Long userId) {
-        List<Task> allByNameContaining = taskRepository.findAllByNameContaining(name);
-        if (!allByNameContaining.isEmpty())
-            return allByNameContaining.stream()
-                    .filter(task -> Objects.equals(task.getUser().getId(), userId))
-                    .collect(Collectors.toList());
-
-        throw new ResourceNotFoundException("Task is not found!");
     }
 
     public Page<Task> getByConditions(MultiConditonReSource resource) {

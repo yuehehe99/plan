@@ -46,7 +46,7 @@ public class UserService {
     public void deleteUser(Long id) {
         User user = userRepository.findByIdAndDeleted(id, false);
         if (null != user) {
-            List<Task> allTask = taskService.getAllTask(user.getId());
+            List<Task> allTask = taskRepository.findTasksByUserIdAndDeleted(user.getId(),false);
             allTask.forEach(task -> {
                 task.setDeleted(true);
                 taskRepository.save(task);
