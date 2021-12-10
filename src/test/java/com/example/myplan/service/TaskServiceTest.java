@@ -129,14 +129,12 @@ public class TaskServiceTest {
 
     @Test
     public void should_return_all_task_when_given_userId() throws Exception {
-//        when(userRepository.findByIdAndDeleted(1L, false)).thenReturn(user);
         when(taskRepository.findAll()).thenReturn(List.of(task));
 
         List<Task> find = taskService.getAllTask();
 
         assertThat(find.contains(task));
         assertThat(find.get(0).getId()).isEqualTo(task.getId());
-//        verify(userRepository).findByIdAndDeleted(1L, false);
         verify(taskRepository).findAll();
     }
 

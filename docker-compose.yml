@@ -1,12 +1,13 @@
 version: '3'
 
 services:
-  myplan1:
+  myplan:
     build: . #Dockerfile文件路径 build  对应命令 docker build
-    image: myplan1:1.0
-    container_name: myplan1
+    image: myplan:1.0
+    container_name: myplan
     ports:
       - '8080:8080'
+#    TZ:
     depends_on:
       - mysql
 

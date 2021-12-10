@@ -2,9 +2,7 @@ package com.example.myplan.controller;
 
 import com.example.myplan.entity.Task;
 import com.example.myplan.entity.User;
-import com.example.myplan.repository.TaskRepository;
 import com.example.myplan.resource.MultiConditonReSource;
-import com.example.myplan.resource.TaskResource;
 import com.example.myplan.service.TaskService;
 import org.junit.After;
 import org.junit.Before;
